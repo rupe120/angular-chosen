@@ -45,8 +45,10 @@ angular.module('localytics.directives').directive 'chosen', ['$timeout', ($timeo
     angular.forEach attr, (value, key) ->
       options[snakeCase(key)] = scope.$eval(value) if key in CHOSEN_OPTION_WHITELIST
 
+    disabled = false
+    
     startLoading = -> element.addClass('loading').attr('disabled', true).trigger('chosen:updated')
-    stopLoading = -> element.removeClass('loading').attr('disabled', false).trigger('chosen:updated')
+    stopLoading = -> element.removeClass('loading').attr('disabled', disabled).trigger('chosen:updated')
 
     chosen = null
     defaultText = null
@@ -85,7 +87,9 @@ angular.module('localytics.directives').directive 'chosen', ['$timeout', ($timeo
     else initOrUpdate()
 
     # Watch the disabled attribute (could be set by ngDisabled)
-    attr.$observe 'disabled', -> element.trigger('chosen:updated')
+    attr.$observe 'disabled', -> 
+        disabled = element[0].disabled
+        element.trigger('chosen:updated')
 
     # Watch the collection in ngOptions and update chosen when it changes.  This works with promises!
     # ngOptions doesn't do anything unless there is an ngModel, so neither do we.
